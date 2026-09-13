@@ -1,0 +1,71 @@
+name: Build Executables
+
+on:
+  push:
+    tags:
+      - 'v*'            # triggers on tags like v1.0, v1.2.3, etc.
+  workflow_dispatch:    # lets you manually trigger a build from the Actions tab
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            output_name: YtDwnld.exe
+            asset_name: YtDwnld-windows.exe
+          - os: macos-latest
+            output_name: YtDwnld
+            asset_name: YtDwnld-macos
+          - os: ubuntu-latest
+            output_name: YtDwnld
+            asset_name: YtDwnld-linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller yt-dlp static_ffmpeg
+
+      - name: Build executable
+        run: |
+          pyinstaller --onefile --windowed --name YtDwnld main.py
+
+      - name: Rename output (Windows)
+        if: matrix.os == 'windows-latest'
+        run: mv dist/YtDwnld.exe dist/${{ matrix.asset_name }}
+
+      - name: Rename output (macOS/Linux)
+        if: matrix.os != 'windows-latest'
+        run: mv dist/YtDwnld dist/${{ matrix.asset_name }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: dist/${{ matrix.asset_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
