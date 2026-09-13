@@ -21,6 +21,8 @@ mp4format = "bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/b
 def download():
     url = url_box.get()
     format = format_choice.get()
+    playlists = playlist_choice.get()
+    ydl_opts['noplaylist'] = False if playlists == "1" else True
     
     if format == "1":
         ydl_opts['format'] = mp3format
@@ -59,17 +61,20 @@ vid_title = tk.Label(root, text="", font=("Arial", 12))
 vid_author = tk.Label(root, text="", font=("Arial", 12))
 
 format_choice = tk.StringVar(value="0")
+playlist_choice = tk.StringVar(value="0")
 
 download_button = tk.Button(root, text="Download!", font=("Arial", 16), command=download, fg="green")
 is_mp3 = tk.Checkbutton(root, text="Download as audio? (mp3)", variable=format_choice)
+download_playlists = tk.Checkbutton(root, text="Download entire playlist?", variable=playlist_choice)
 
 prog_name.pack()
 vid_title.pack()
 vid_author.pack()
 
 url_box.pack(pady=16)
-download_button.pack(pady=50)
+download_button.pack(pady=38)
 is_mp3.pack()
+download_playlists.pack()
 # -----------------
 
 root.mainloop()
