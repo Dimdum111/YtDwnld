@@ -1,17 +1,31 @@
 # YtDwnld (If you see this - This project is now open source!)
-from pytubefix import YouTube
+import yt_dlp
 import tkinter as tk
 import os
+import static_ffmpeg
 
+static_ffmpeg.add_paths()
+output_folder = "YtDwnld Downloads"
 os.makedirs("YtDwnld Downloads", exist_ok=True)
+
+ydl_opts = {
+    'format': 'bestvideo+bestaudio/best',
+    'merge_output_format': 'mp4',
+    'outtmpl': f'{output_folder}/%(title)s.%(ext)s',
+    'quiet': True,
+}
 
 def download():
     url = url_box.get()
-    yt = YouTube(url)
-    title, author = yt.title, yt.author
-    vid_title.config(text=title)
-    vid_author.config(text=f"By: {author}")
-    print(f"Downloading: {title}")
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        
+        title = info.get("title")
+        author = info.get("uploader")
+        
+        vid_title.config(text=title)
+        vid_author.config(text=f"By: {author}")
+        ydl.download([url])
 
 
 # -- Setting up tkinter --
