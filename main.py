@@ -20,6 +20,20 @@ mp4format = "bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/b
 
 def download():
     url = url_box.get()
+    format = format_choice.get()
+    
+    if format == "1":
+        ydl_opts['format'] = mp3format
+        ydl_opts['postprocessors'] = [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }]
+    
+    else:
+        ydl_opts['format'] = mp4format
+        ydl_opts['postprocessors'] = []
+    
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
         
@@ -44,8 +58,10 @@ url_box = tk.Entry(root, width=50)
 vid_title = tk.Label(root, text="", font=("Arial", 12))
 vid_author = tk.Label(root, text="", font=("Arial", 12))
 
+format_choice = tk.StringVar(value="0")
+
 download_button = tk.Button(root, text="Download!", font=("Arial", 16), command=download, fg="green")
-is_mp3 = tk.Checkbutton(root, text="Download as audio? (mp3)")
+is_mp3 = tk.Checkbutton(root, text="Download as audio? (mp3)", variable=format_choice)
 
 prog_name.pack()
 vid_title.pack()
@@ -57,3 +73,5 @@ is_mp3.pack()
 # -----------------
 
 root.mainloop()
+
+# This is just a fun project, I just made it for fun and also for myself because i needed a yt downloader
