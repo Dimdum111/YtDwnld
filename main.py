@@ -9,11 +9,14 @@ output_folder = "YtDwnld Downloads"
 os.makedirs("YtDwnld Downloads", exist_ok=True)
 
 ydl_opts = {
-    'format': 'bestvideo+bestaudio/best',
-    'merge_output_format': 'mp4',
+    'format': 'bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
     'outtmpl': f'{output_folder}/%(title)s.%(ext)s',
-    'quiet': True,
+    'noplaylist': True,
+    'merge_output_format': 'mp4',
 }
+
+mp3format = "bestaudio/best"
+mp4format = "bestvideo[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
 
 def download():
     url = url_box.get()
@@ -42,7 +45,7 @@ vid_title = tk.Label(root, text="", font=("Arial", 12))
 vid_author = tk.Label(root, text="", font=("Arial", 12))
 
 download_button = tk.Button(root, text="Download!", font=("Arial", 16), command=download, fg="green")
-# is_mp3 = tk.Checkbutton(root, text="Download as audio? (mp3)")
+is_mp3 = tk.Checkbutton(root, text="Download as audio? (mp3)")
 
 prog_name.pack()
 vid_title.pack()
@@ -50,7 +53,7 @@ vid_author.pack()
 
 url_box.pack(pady=16)
 download_button.pack(pady=50)
-# is_mp3.pack()
+is_mp3.pack()
 # -----------------
 
 root.mainloop()
